@@ -1,3 +1,7 @@
+;;;
+;;; https://github.com/everbot/clojure-playground
+;;;
+
 (ns clojure-playground.core
   (:gen-class))
 
@@ -75,7 +79,7 @@
 
 (Math/sqrt 9) ; access Java class' static member
 (Math/E) ; value of the constant e
-(println Math/PI) ; print cnstant PI
+(println Math/PI) ; print constant PI
 
 ; create Java class instance
 (new java.util.HashMap {"foo" 42 "bar" 9 "baz" "test"})

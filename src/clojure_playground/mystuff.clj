@@ -1,3 +1,7 @@
+;;;
+;;; https://github.com/everbot/clojure-playground
+;;;
+
 (ns clojure-playground.mystuff
   (:gen-class))
 
