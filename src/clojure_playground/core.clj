@@ -114,9 +114,9 @@
               f))))
 (mirror (list 1 2 3))
 
-(def isPrime
-  " Test if a number is prime number"
-  [x])
+; (def isPrime
+;   " Test if a number is prime number"
+;   [x])
 
 
 ; ======================================================================
