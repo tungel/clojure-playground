@@ -70,8 +70,14 @@
 
 (range 5)
 (range 1 5)
+(count (range 5))
+(count (range 1 5))
+(count [1 2 3])
+(count (list 1 2 3))
 
 (for [x (range 3) y (range 2)] [x y])
+
+(for [x (range 10)] (println x))
 
 (find-doc "xor") ; find the doc for xor function
 (bit-xor 10 9)
@@ -80,6 +86,7 @@
 (Math/sqrt 9) ; access Java class' static member
 (Math/E) ; value of the constant e
 (println Math/PI) ; print constant PI
+(rem 9 5) ; remainder
 
 ; create Java class instance
 (new java.util.HashMap {"foo" 42 "bar" 9 "baz" "test"})
@@ -106,6 +113,10 @@
               (mirror (rest ls))
               f))))
 (mirror (list 1 2 3))
+
+(def isPrime
+  " Test if a number is prime number"
+  [x])
 
 
 ; ======================================================================
