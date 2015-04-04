@@ -114,13 +114,25 @@
               f))))
 (mirror (list 1 2 3))
 
-; (def isPrime
-;   " Test if a number is prime number"
-;   [x])
-
+(defn isPrime
+  " Test if a number is prime number"
+  [x]
+  (if (= 2 x)
+    true
+    (if (even? x)
+      false
+      (let [max (Math/sqrt x)]
+        (loop [i 3]
+          (if (> i max)
+            true
+            (if (zero? (rem x i))
+              false
+              (recur (+ i 2)))))))))
+(isPrime 15)
 
 ; ======================================================================
 ;;; Experiment with graphics
+;;; Code reference from Michael Fogus & Chris Houser - The Joy of Clojure
 (def frame (java.awt.Frame.))
 (for [method (seq (.getMethods java.awt.Frame))
       :let [method-name (.getName method)]
