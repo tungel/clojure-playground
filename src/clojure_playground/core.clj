@@ -156,6 +156,8 @@
 ; ======================================================================
 
 (reverse "tung")
+(str \t)
+(str 3)
 (apply str (reverse "tung"))
 (filter even? (range 10))
 
