@@ -62,12 +62,6 @@
   (println "Radius is " r)
   (* pi r-square))
 
-(defn sum [n]
-  (if (= n 0)
-    0
-    (+ n (sum (- n 1)))))
-(sum 10)
-
 (range 5)
 (range 1 5)
 (count (range 5))
@@ -87,6 +81,8 @@
 (Math/E) ; value of the constant e
 (println Math/PI) ; print constant PI
 (rem 9 5) ; remainder
+(println Integer/MAX_VALUE)
+(println Integer/MIN_VALUE)
 
 ; create Java class instance
 (new java.util.HashMap {"foo" 42 "bar" 9 "baz" "test"})
@@ -103,6 +99,33 @@
 
 ; use .. macro to make the code easier to read compare to the preceding code
 (.. (java.util.Date.) toString (endsWith "2015"))
+
+(defn fastPower [a b]
+  (if (zero? b)
+    1
+    (if (even? b)
+      (fastPower (* a a) (quot b 2))
+      (* a (fastPower (* a a) (quot b 2))))))
+
+(defn fast-power [a b]
+  (cond (zero? b) 1
+        (= b 1) a
+        (even? b) (square (fast-power a (quot b 2)))
+        (odd? b) (* a (fast-power a (dec b)))))
+
+(fastPower 2 10)
+(fast-power 2 10)
+
+(quot 1 2)
+
+(power 2 3)
+
+
+(defn sum [n]
+  (if (zero? n)
+    0
+    (+ n (sum (dec n)))))
+(sum 10)
 
 
 (defn mirror [ls]
