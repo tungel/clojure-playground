@@ -118,9 +118,6 @@
 
 (quot 1 2)
 
-(power 2 3)
-
-
 (defn sum [n]
   (if (zero? n)
     0
