@@ -73,7 +73,7 @@
 
 (for [x (range 10)] (println x))
 
-(find-doc "xor") ; find the doc for xor function
+; (find-doc "xor") ; find the doc for xor function
 (bit-xor 10 9)
 
 
@@ -153,26 +153,26 @@
 ; ======================================================================
 ;;; Experiment with graphics
 ;;; Code reference from Michael Fogus & Chris Houser - The Joy of Clojure
-(def frame (java.awt.Frame.))
-(for [method (seq (.getMethods java.awt.Frame))
-      :let [method-name (.getName method)]
-      :when (re-find #"Vis" method-name)]
-  method-name)
-(.setVisible frame true)
-(.setSize frame (java.awt.Dimension. 500 500))
-(def gfx (.getGraphics frame))
-(.fillRect gfx 100 100 50 75)
-(.setColor gfx (java.awt.Color. 255 128 0))
-(.fillRect gfx 100 150 75 50)
+; (def frame (java.awt.Frame.))
+; (for [method (seq (.getMethods java.awt.Frame))
+;       :let [method-name (.getName method)]
+;       :when (re-find #"Vis" method-name)]
+;   method-name)
+; (.setVisible frame true)
+; (.setSize frame (java.awt.Dimension. 500 500))
+; (def gfx (.getGraphics frame))
+; (.fillRect gfx 100 100 50 75)
+; (.setColor gfx (java.awt.Color. 255 128 0))
+; (.fillRect gfx 100 150 75 50)
 
-(defn xors [maxX maxY]
-  (for [x (range maxX) y (range maxY)]
-    [x y (bit-xor x y)]))
-(doseq [[ x y xor ] (xors 200 200)]
-        (.setColor gfx (java.awt.Color. xor xor xor))
-        (.fillRect gfx x y 1 1))
+; (defn xors [maxX maxY]
+;   (for [x (range maxX) y (range maxY)]
+;     [x y (bit-xor x y)]))
+; (doseq [[ x y xor ] (xors 200 200)]
+;         (.setColor gfx (java.awt.Color. xor xor xor))
+;         (.fillRect gfx x y 1 1))
 
-(.dispose frame) ; close the frame
+; (.dispose frame) ; close the frame
 ; ======================================================================
 
 (reverse "tung")
@@ -193,4 +193,65 @@
 (.println java.lang.System/out "hi")
 (.. (System/out) (println "hello"))
 
+
+
+(defn strToBytes [str]
+  (bytes (byte-array (map (comp byte int) str))))
+; (def a (bytes (byte-array (map (comp byte int) "aA-clojure"))))
+(def a (strToBytes "abc"))
+(get a 2)
+
+; print hex value
+(format "%x" 255)
+
+(defn checkSum [packet]
+  (bit-and (bit-not (reduce + packet)) 0xFF))
+
+(defn buildMsg [id address val1 val2]
+  (let [packet
+    [id
+    7
+    3
+    address
+    (bit-and val1 0xFF)
+    (bit-and val1 0xFF00)
+    (bit-and val2 0xFF)
+    (bit-and val2 0xFF00)
+    ]]
+    (into [255 255] (conj packet (checkSum packet)))))
+
+(defn buildMsg [id address l]
+  (let [packet
+    [id
+    4
+    2
+    address
+    l
+    ]]
+    (into [255 255] (conj packet (checkSum packet)))))
+
+; try serial port
+(use 'serial.core)
+(use 'serial.util)
+(list-ports)
+; (def port (open "/dev/ttyUSB0"))
+(def port (open "/dev/ttyUSB1" :baud-rate 115200))
+
+(write port [97 65])
+(write port (strToBytes "hello RS232"))
+
+; move motor
+(println (buildMsg 3 30 200 1000))
+(write port (buildMsg 3 30 300 200))
+
+; read model number
+(println (buildMsg 1 0 3))
+(format "%x" (checkSum [1 4 2 3]))
+
+(write port [255 255 3 7 3 30 100 0 232 768 138])
+(format "%x" (checkSum [2]))
+
+; callback function to print out received data from RS232
+(listen port #(print (char (.read %))))
+(close! port)
 
