@@ -150,6 +150,49 @@
               (recur (+ i 2)))))))))
 (isPrime 15)
 
+; ===================================
+; showing intermediate result of sum
+(reductions + (range 10))
+
+; test
+(defn add+
+  {:test #(do
+            (assert (= (add+ 2 3) 5))
+            (assert (= (add+ 1 8) 9)))}
+  [x y] (+ x y))
+(test #'add+) ; trigger
+
+
+; clojure.pprint/cl-format
+(clojure.pprint/cl-format nil "~:r" 12345)
+; => "twelve thousand, three hundred forty-fifth"
+(clojure.pprint/cl-format nil "~@r" 1234)
+; => "MCCXXXIV"
+
+
+; browse URL
+(def url "https://google.com")
+;; (clojure.java.browse/browse-url url)
+
+; Java doc
+;; (clojure.java.javadoc/javadoc (list* 1 []))
+; open clojure.lang.Cons Javadoc
+
+
+; inspect
+(require '[clojure.inspector :as ins])
+(def m {:a "a"
+        :b {:c "c"
+            :d [1 2 3]
+            :e {:f "f"
+                :g "g"
+                :h "h"}}
+        :i [4 5 6]
+        :l {:m "m"
+            :n "n"}
+        :o [{:p "p" :q "q"}]})
+;; (ins/inspect-tree m)
+
 ; ======================================================================
 ;;; Experiment with graphics
 ;;; Code reference from Michael Fogus & Chris Houser - The Joy of Clojure
@@ -214,13 +257,13 @@
     3
     address
     (bit-and val1 0xFF)
-    (bit-and val1 0xFF00)
+    (bit-shift-right (bit-and val1 0xFF00) 8)
     (bit-and val2 0xFF)
-    (bit-and val2 0xFF00)
+    (bit-shift-right (bit-and val2 0xFF00) 8)
     ]]
     (into [255 255] (conj packet (checkSum packet)))))
 
-(defn buildMsg [id address l]
+(defn readModel [id address l]
   (let [packet
     [id
     4
@@ -231,27 +274,57 @@
     (into [255 255] (conj packet (checkSum packet)))))
 
 ; try serial port
-(use 'serial.core)
-(use 'serial.util)
-(list-ports)
-; (def port (open "/dev/ttyUSB0"))
-(def port (open "/dev/ttyUSB1" :baud-rate 115200))
+; (require '[serial.core :as s])
+; (require '[serial.util :as u])
+; (u/list-ports)
+; (def port (s/open "/dev/ttyUSB0" :baud-rate 115200))
+; (s/listen port #(println (format "%x" (.read %)))) ; `print` doesn't work!
+; (s/listen port #(println "tung"))
+; (s/write port [97 65])
+; (s/write port (strToBytes "hello RS232"))
+; (s/unlisten! port)
+; (s/close port)
 
-(write port [97 65])
-(write port (strToBytes "hello RS232"))
 
-; move motor
-(println (buildMsg 3 30 200 1000))
-(write port (buildMsg 3 30 300 200))
+; (use 'serial.core)
+; (use 'serial.util)
+; (list-ports)
+; ; (def port (open "/dev/ttyUSB0"))
+; (def port (open "/dev/ttyUSB0" :baud-rate 9600))
 
-; read model number
-(println (buildMsg 1 0 3))
-(format "%x" (checkSum [1 4 2 3]))
+; (write port [97 65])
+; (write port (strToBytes "hello RS232"))
 
-(write port [255 255 3 7 3 30 100 0 232 768 138])
-(format "%x" (checkSum [2]))
+; ; move motor
+; (println (buildMsg 3 30 200 1000))
+; (s/write port (buildMsg 1 30 500 300))
+; (print (buildMsg 3 30 1000 200))
+; (map #(format "%x" %) (buildMsg 3 30 1000 200))
+; write_port("ff ff 3 7 3 1e e8 3 c8 0 21")
+; (print (buildMsg 3 30 1 200))
+; (map #(format "%x" %) (buildMsg 3 30 1 200))
+; write_port("ff ff 3 7 3 1e 1 0 c8 0 b")
+; (s/write port (readModel 2 0 3))
+; (print (readModel 3 0 3))
 
-; callback function to print out received data from RS232
-(listen port #(print (char (.read %))))
-(close! port)
+
+; for testing
+; clojure-playground.core=> (print (buildMsg 3 30 1000 200))
+; [255 255 3 7 3 30 232 768 200 0 36]nil
+; clojure-playground.core=> (print (buildMsg 3 30 1 200))
+; [255 255 3 7 3 30 1 0 200 0 11]nil
+; clojure-playground.core=> (print (readModel 3 0 3))
+; [255 255 3 4 2 0 3 243]nil
+
+
+; ; read model number
+; (println (buildMsg 1 0 3))
+; (format "%x" (checkSum [1 4 2 3]))
+
+; (write port [255 255 3 7 3 30 100 0 232 768 138])
+; (format "%x" (checkSum [2]))
+
+; ; callback function to print out received data from RS232
+; (listen port #(print (char (.read %))))
+; (close! port)
 
